@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FairShare | Group expenses, settled clearly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">F</span><span>FairShare</span></div>
+    <p>Group expenses, settled clearly.</p>
+    <button class="button button-ghost" id="resetButton" type="button">Reset pool</button>
+  </header>
+
+  <main class="shell">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">EXPENSE WORKSPACE</p>
+        <h1 id="pageTitle">Your shared expense, made fair.</h1>
+        <p class="intro-copy">Add what everyone paid. FairShare turns the numbers into a simple plan to settle up.</p>
+      </div>
+      <div class="status-chip"><span class="status-dot"></span><span id="liveLabel">Live calculation</span></div>
+    </section>
+
+    <div id="errorMessage" class="alert" role="alert" hidden></div>
+
+    <section class="setup-grid">
+      <div class="panel pool-panel">
+        <div class="panel-heading"><div><p class="eyebrow">01 / POOL DETAILS</p><h2>Set the occasion</h2></div></div>
+        <div class="fields">
+          <label class="field field-wide">Event / pool name<input id="poolName" type="text" placeholder="e.g. Weekend getaway" autocomplete="off"></label>
+          <label class="field">Target amount<div class="input-with-prefix"><span id="currencyPrefix">₹</span><input id="targetAmount" type="number" min="0.01" step="0.01" placeholder="0.00"></div></label>
+          <label class="field">Currency symbol<input id="currency" type="text" maxlength="3" value="₹" aria-label="Currency symbol"></label>
+        </div>
+      </div>
+      <div class="panel add-panel">
+        <div class="panel-heading"><div><p class="eyebrow">02 / CONTRIBUTION</p><h2>Add a participant</h2></div><span class="step-icon">+</span></div>
+        <form id="participantForm" class="add-form">
+          <label class="field">Name<input id="participantName" type="text" placeholder="Participant name" autocomplete="off"></label>
+          <label class="field">Amount paid<div class="input-with-prefix"><span id="paidPrefix">₹</span><input id="paidAmount" type="number" min="0" step="0.01" placeholder="0.00"></div></label>
+          <button class="button button-primary" type="submit"><span>+</span> Add person</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Pool summary">
+      <article class="metric-card metric-highlight"><span class="metric-label">Target pool</span><strong id="targetMetric">₹0.00</strong><span class="metric-note">Required for the expense</span></article>
+      <article class="metric-card"><span class="metric-label">Total collected</span><strong id="collectedMetric">₹0.00</strong><span class="metric-note" id="remainingNote">₹0.00 remaining</span></article>
+      <article class="metric-card"><span class="metric-label">Equal share</span><strong id="shareMetric">₹0.00</strong><span class="metric-note">Per participant</span></article>
+      <article class="metric-card"><span class="metric-label">Participants</span><strong id="countMetric">0</strong><span class="metric-note">In this pool</span></article>
+      <article class="metric-card progress-card"><div class="metric-top"><span class="metric-label">Pool status</span><strong id="statusMetric">Not Started</strong></div><div class="progress-track"><div id="progressBar" class="progress-bar"></div></div><span class="metric-note" id="progressNote">0% funded</span></article>
+    </section>
+
+    <section class="content-grid">
+      <div class="panel participants-panel">
+        <div class="section-heading"><div><p class="eyebrow">03 / BREAKDOWN</p><h2>Participant contributions</h2></div><span id="participantCountLabel" class="count-badge">0 people</span></div>
+        <div id="emptyState" class="empty-state"><span class="empty-icon">+</span><h3>Your pool is waiting for people</h3><p>Add participants above to see each fair share and balance.</p></div>
+        <div class="table-wrap"><table id="participantsTable"><thead><tr><th>Participant</th><th>Fair share</th><th>Paid</th><th>Balance</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="participantsBody"></tbody></table></div>
+      </div>
+      <aside class="panel settlement-panel">
+        <div class="section-heading"><div><p class="eyebrow">04 / NEXT STEPS</p><h2>Settle up</h2></div><span class="settle-icon">↗</span></div>
+        <p class="settlement-intro">The simplest way to bring every balance back to zero.</p>
+        <div id="settlementList" class="settlement-list"><p class="settlement-empty">Add at least two people with different contributions to generate settlements.</p></div>
+        <div class="settlement-footer"><span>Transactions</span><strong id="transactionCount">0</strong></div>
+      </aside>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
