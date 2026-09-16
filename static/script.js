@@ -88,6 +88,35 @@ $('participantsBody').addEventListener('click', (event) => {
   if (remove !== undefined) { state.participants.splice(Number(remove), 1); calculate(); }
 });
 
+function renderImportReport(report) {
+  const reportElement = $('importReport');
+  reportElement.hidden = false;
+  const cards = [['Rows', report.rows_received], ['Imported', report.valid_rows], ['Duplicates', report.duplicates_removed], ['Merged', report.rows_merged], ['Rejected', report.rows_rejected], ['Total imported', money(report.total_imported)]];
+  const merged = report.merged_names.length ? report.merged_names.map((item) => `<div class="report-item"><strong>${escapeHtml(item.name)}</strong><span>← ${item.variants.map(escapeHtml).join(', ')}</span></div>`).join('') : '<p class="report-muted">No name variants needed merging.</p>';
+  const duplicates = report.duplicate_rows.length ? report.duplicate_rows.map((item) => `<div class="report-line">Row ${item.row} → duplicate of row ${item.duplicate_of}</div>`).join('') : '<p class="report-muted">No duplicate records removed.</p>';
+  const rejected = report.rejected_rows.length ? `<div class="report-table"><div class="report-line report-header"><span>Row</span><span>Name</span><span>Amount</span><span>Reason</span></div>${report.rejected_rows.map((item) => `<div class="report-line"><span>${item.row}</span><span>${escapeHtml(item.name) || '—'}</span><span>${escapeHtml(item.amount) || '—'}</span><span>${escapeHtml(item.reason)}</span></div>`).join('')}</div>` : '<p class="report-muted">No rejected rows.</p>';
+  reportElement.innerHTML = `<div class="import-success">Import completed successfully. ${report.valid_rows} valid contribution${report.valid_rows === 1 ? '' : 's'} added to this pool.</div><div class="report-cards">${cards.map(([label, value]) => `<div class="report-card"><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><div class="report-details"><div><h3>Merged participants</h3>${merged}</div><div><h3>Duplicate records</h3>${duplicates}</div><div class="rejected-detail"><h3>Rejected records</h3>${rejected}</div></div>`;
+}
+
+$('csvFile').addEventListener('change', () => { $('fileLabel').textContent = $('csvFile').files[0]?.name || 'Choose a CSV file'; });
+$('importForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const file = $('csvFile').files[0];
+  if (!file) return showError('Choose a CSV file before importing.');
+  const formData = new FormData(); formData.append('file', file);
+  try {
+    const response = await fetch('/api/import', { method: 'POST', body: formData }); const report = await response.json();
+    if (!response.ok) return showError(report.error);
+    const indexes = new Map(state.participants.map((person, index) => [person.name.trim().toLowerCase(), index]));
+    report.imported_participants.forEach((imported) => {
+      const index = indexes.get(imported.name.toLowerCase());
+      if (index === undefined) { indexes.set(imported.name.toLowerCase(), state.participants.length); state.participants.push(imported); }
+      else state.participants[index].paid = (Math.round((Number(state.participants[index].paid) + Number(imported.paid)) * 100) / 100).toFixed(2);
+    });
+    renderImportReport(report); showError(''); await calculate();
+  } catch (error) { showError('The CSV could not be imported. Please try again.'); }
+});
+
 ['poolName', 'targetAmount', 'currency'].forEach((id) => $(id).addEventListener('input', calculate));
 $('resetButton').addEventListener('click', resetForm);
 loadExample();

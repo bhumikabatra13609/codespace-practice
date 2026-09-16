@@ -10,6 +10,7 @@ FairShare is a lightweight group expense and settlement manager. It calculates e
 - Integer-paise calculations for reliable decimal money handling.
 - Largest-debt-to-largest-credit settlement matching.
 - Client-side and backend validation with responsive HTML/CSS/JavaScript UI.
+- Messy historical contribution CSV import with normalization and an audit report.
 
 ## Technology
 
@@ -43,3 +44,16 @@ Fair share is `target amount / participant count`. Each balance is `paid - fair 
 ## Example usage
 
 The initial pool is the Farewell Gift example: target ₹6000, six participants, and a ₹1000 fair share. Rahul and Karan receive ₹1000, Aman receives ₹500, while Priya, Neha, and Simran owe ₹500, ₹1000, and ₹1000 respectively.
+
+## Importing historical contributions
+
+Upload a CSV with this header and one contribution per row:
+
+```csv
+name,amount
+Rahul,"₹1,000"
+rahul,500
+Priya,500.50
+```
+
+Names are trimmed, internal whitespace is collapsed, and capitalization differences are merged. Amounts accept plain decimals, commas, `₹`, `Rs`, `Rs.`, and `INR`; negative or unparseable values are rejected. Identical cleaned name-and-amount records are kept once, while different records for the same normalized person are aggregated into the existing participant. The import report lists received, imported, duplicate, merged, and rejected rows, total imported, and row-level details.

@@ -47,6 +47,15 @@
       </div>
     </section>
 
+    <section class="panel import-panel">
+      <div class="section-heading"><div><p class="eyebrow">IMPORT PAST CONTRIBUTIONS</p><h2>Bring in historical payments</h2><p class="panel-subtitle">Valid contributions are added to matching participants. Exact repeated records are counted once.</p></div><span class="import-icon">↓</span></div>
+      <form id="importForm" class="import-form">
+        <label class="file-picker"> <span id="fileLabel">Choose a CSV file</span><input id="csvFile" type="file" accept=".csv,text/csv"></label>
+        <button class="button button-primary" type="submit">Import contributions</button>
+      </form>
+      <div id="importReport" class="import-report" hidden></div>
+    </section>
+
     <section class="metrics" aria-label="Pool summary">
       <article class="metric-card metric-highlight"><span class="metric-label">Target pool</span><strong id="targetMetric">₹0.00</strong><span class="metric-note">Required for the expense</span></article>
       <article class="metric-card"><span class="metric-label">Total collected</span><strong id="collectedMetric">₹0.00</strong><span class="metric-note" id="remainingNote">₹0.00 remaining</span></article>

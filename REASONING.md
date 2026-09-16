@@ -298,6 +298,18 @@ The exact transaction pairing may vary because multiple valid settlement combina
 
 ---
 
+# 17. Messy Contribution Import – Reasoning
+
+Historical payment data is often copied from spreadsheets or messages, so cleaning is necessary before it can affect balances. The import uses Python's `csv` reader, trims names, collapses repeated internal whitespace, and compares normalized names case-insensitively while retaining the first clean display spelling.
+
+Amounts are converted to integer paise after removing supported `₹`, `Rs`, `Rs.`, and `INR` prefixes and comma separators. This keeps decimal calculations reliable. Missing names, missing amounts, malformed rows, negative amounts, and values such as `abc` are rejected individually so one bad row does not block the rest of the file.
+
+An exact duplicate is the same normalized name and amount appearing again, so only its first occurrence is counted. A merge is different: distinct valid contribution records such as `Rahul,500` and `rahul,300` belong to one normalized participant and are added together. The report shows these categories separately, including row numbers and rejected-row reasons, so the organiser can audit the import.
+
+The API returns aggregated imported participants. The browser adds each amount to a matching existing participant, or creates one new participant when needed; it never creates a second entry for the same normalized name. The resulting participant list then follows the existing fair-share, balance, and settlement pipeline.
+
+For example, `Rahul,1000`, `rahul,500`, and `RAHUL,500` become one Rahul participant with ₹1500 imported, while the final report identifies the last row as an exact duplicate rather than silently counting it twice.
+
 ## 10. Handling Extra Payments
 
 An extra payment is not treated as an error.
